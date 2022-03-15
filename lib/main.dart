@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: _counter,
         itemBuilder: (context, index) {
           return ListTile(
-            leading: Icon(Icons.account_circle),
+            leading: Icon(FontAwesomeIcons.book),
             title: Text('Name of item'),
             onTap: () {
               Navigator.push(
@@ -77,11 +78,12 @@ class SecondPage extends StatelessWidget {
         title: Text('Second screen'),
       ),
       body: Center(
-        child: ElevatedButton(
-          child: Text('Go back!'),
+        child: ElevatedButton.icon(
+          label: Text('Go back!'),
           onPressed: () {
             Navigator.pop(context);
           },
+          icon: Icon(FontAwesomeIcons.stepBackward),
         ),
       ),
     );
