@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,26 +20,76 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const MyHomePage(title: 'My App'),
+      home: MyHomePage(
+        title: 'My App',
+        storage: CounterStorage(),
+      ),
     );
   }
 }
 
+class CounterStorage {
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+
+    return File('$path/counter.txt');
+  }
+
+  Future<int> readCounter() async {
+    try {
+      final file = await _localFile;
+
+      String contents = await file.readAsString();
+
+      return int.parse(contents);
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<File> writeCounteer(int counter) async {
+    final file = await _localFile;
+
+    return file.writeAsString('$counter');
+  }
+}
+
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
   final String title;
+  final CounterStorage storage;
+
+  const MyHomePage({Key? key, required this.title, required this.storage})
+      : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  late int _counter;
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    super.initState();
+    widget.storage.readCounter().then((int value) {
+      setState(() {
+        _counter = value;
+      });
+    });
+  }
+
+  Future<File> _incrementCounter() async {
     setState(() {
       _counter++;
     });
+
+    return widget.storage.writeCounteer(_counter);
   }
 
   @override
